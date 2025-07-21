@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Windows 11 VM Launcher</title>
+</head>
+<body>
+  <h1>Upload a Windows 11 ISO</h1>
+  <input type="file" id="iso" accept=".iso" />
+  <button onclick="uploadISO()">Upload & Boot</button>
+
+  <p id="status"></p>
+
+  <script>
+    async function uploadISO() {
+      const fileInput = document.getElementById("iso");
+      const file = fileInput.files[0];
+      const status = document.getElementById("status");
+
+      if (!file || !file.name.endsWith(".iso")) {
+        status.innerText = "Please select a valid .iso file.";
+        return;
+      }
+
+      status.innerText = "Uploading...";
+      const formData = new FormData();
+      formData.append("iso", file);
+
+      try {
+        const res = await fetch("https://your-backend-url.onrender.com/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          status.innerHTML = `VM started. <a href="${data.vnc}" target="_blank">Open VM</a>`;
+        } else {
+          status.innerText = "Error: " + data.error;
+        }
+      } catch (err) {
+        status.innerText = "Upload failed: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
